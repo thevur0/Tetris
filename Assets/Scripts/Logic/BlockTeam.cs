@@ -15,6 +15,7 @@ public class BlockTeam  {
     protected List<BaseBlock> m_BlockList = new List<BaseBlock>((int) BlockIndex.BI_Count);
     static protected List<int[,]> ms_RotPos = new List<int[,]>();
     protected List<int[,]>.Enumerator m_PosEnumer;
+    protected Vector2 m_Pos = Vector2.zero;
 
     public BlockTeam()
     {
