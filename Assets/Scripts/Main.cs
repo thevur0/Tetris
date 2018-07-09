@@ -10,11 +10,10 @@ public class Main : MonoBehaviour {
         InitTimer();
 
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    // Update is called once per frame
+    void Update () {
+        CheckMouse();
+    }
 
     BlockWall m_BlockWall = new BlockWall();
     public void OnGameStart()
@@ -56,4 +55,72 @@ public class Main : MonoBehaviour {
         m_Timer.Enabled = false;
     }
 
+
+    void OnClick()
+    {
+        Debug.Log("OnClick");
+    }
+    void OnLeftMove()
+    {
+        Debug.Log("OnLeftMove");
+    }
+    void OnRightMove()
+    {
+        Debug.Log("OnRightMove");
+    }
+    void OnDropDown()
+    {
+        Debug.Log("OnDropDown");
+    }
+    bool m_bGetBeginPos = false;
+    Vector3 m_BeginPosition = Vector3.zero;
+    float m_fCheckTime = 0.5f;
+    float m_fSaveTime = 0.0f;
+    float m_fMoveDis = 1.0f;
+    void CheckMouse()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            m_fSaveTime = 0;
+            if (m_bGetBeginPos)
+            {
+                m_BeginPosition = Input.mousePosition;
+                m_bGetBeginPos = false;
+            }
+        }
+        bool bMove = false;
+        if (Input.GetMouseButton(0))
+        {
+            m_fSaveTime += Time.deltaTime;
+            if (m_fSaveTime > m_fCheckTime)
+            {
+                Vector3 vDis = Input.mousePosition - m_BeginPosition;
+                if (Mathf.Abs(vDis.x) > m_fMoveDis)
+                {
+                    if (vDis.x < 0)
+                        OnLeftMove();
+                    else
+                        OnRightMove();
+                    m_BeginPosition = Input.mousePosition;
+                    bMove = true;
+                }
+            }
+        }
+        if (Input.GetMouseButtonUp(0))
+        {
+            m_bGetBeginPos = true;
+            if (!bMove)
+            {
+                Vector3 vDis = Input.mousePosition - m_BeginPosition;
+                if (Mathf.Abs(vDis.y) > Mathf.Abs(vDis.x) * 3.0f / 2.0f)
+                {
+                    OnDropDown();
+                }
+                else if (m_fSaveTime < m_fCheckTime) 
+                {
+                    OnClick();
+                }
+            }
+        }
+    }
 }
