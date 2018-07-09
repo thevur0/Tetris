@@ -7,8 +7,9 @@ public class Main : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
-	}
+        InitTimer();
+
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -16,18 +17,29 @@ public class Main : MonoBehaviour {
 	}
 
     BlockWall m_BlockWall = new BlockWall();
-    void OnGameStart()
+    public void OnGameStart()
     {
         m_BlockWall.Reset();
+        StartTimer();
+    }
+    public void OnPauseGame()
+    {
+        if (m_Timer.Enabled)
+            StopTimer();
+        else
+            StartTimer();
+    }
+    void InitTimer()
+    {
+        m_Timer.Elapsed += new System.Timers.ElapsedEventHandler(OnTimer);
+        m_Timer.Interval = 1.0f;
     }
 
     System.Timers.Timer m_Timer = new System.Timers.Timer();
     void StartTimer()
     {
-        m_Timer.Interval = 1.0f;
         m_Timer.Enabled = true;
-        m_Timer.Start();
-        m_Timer.Elapsed += new System.Timers.ElapsedEventHandler(OnTimer);
+        m_Timer.Start();   
     }
 
     void OnTimer(object sender,System.Timers.ElapsedEventArgs e)

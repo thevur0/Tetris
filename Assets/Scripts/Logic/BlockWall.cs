@@ -63,12 +63,16 @@ public class BlockWall {
             for (int j = 0; j < bt.GetHeight(); j++)
             {
                 int iBTValue, iWallValue;
-                if (bt.GetValue(i, j, out iBTValue) && GetValue(i+ vPos.x, j+ vPos.y, out iWallValue))
+                if (bt.GetValue(i, j, out iBTValue) && GetValue(i + vPos.x, j + vPos.y, out iWallValue))
                 {
                     if (iBTValue + iWallValue > 1)
                     {
                         return true;
                     }
+                }
+                else
+                {
+                    return true;
                 }
             }
         }
@@ -125,34 +129,75 @@ public class BlockWall {
     {
         BlockTeam bt = m_CurBlockTeam;
         if (!IsCollide(bt, BT_Move_Type.BTM_Left))
-            bt.OnLeft();
+            bt.MoveLeft();
     }
 
     public void OnRight()
     {
         BlockTeam bt = m_CurBlockTeam;
         if (!IsCollide(bt, BT_Move_Type.BTM_Right))
-            bt.OnRight();
+            bt.MoveRight();
     }
 
-    public void OnTimer()
-    {
-        if (m_CurBlockTeam == null)
-            NewBlockTeam();
-        else
-            OnDown();
-    }
     public void OnDown()
     {
         BlockTeam bt = m_CurBlockTeam;
         if (!IsCollide(bt, BT_Move_Type.BTM_Down))
-            bt.OnDown();
+            bt.MoveDown();
         else
         {
             Merge(bt);
             m_CurBlockTeam = null;
         }
     }
+
+    public void OnRot()
+    {
+        BlockTeam bt = m_CurBlockTeam.Clone();
+        bt.Rot();
+        if (!IsCollide(bt, BT_Move_Type.BTM_None))
+            m_CurBlockTeam.Rot();
+        else
+        {
+            BlockTeam btLeft = bt;
+            BlockTeam btRight = bt.Clone();
+            for (int i = 0;i< bt.GetBlockWidth(); i++)
+            {
+                btLeft.MoveLeft();
+                if (!IsCollide(btLeft, BT_Move_Type.BTM_None))
+                {
+                    m_CurBlockTeam.Rot();
+                    for (int j = i;j>=0;j--)
+                    {
+                        m_CurBlockTeam.MoveLeft();
+                    }
+                    break;
+                }
+                btRight.MoveRight();
+                if (!IsCollide(btRight, BT_Move_Type.BTM_None))
+                {
+                    m_CurBlockTeam.Rot();
+                    for (int j = i; j >= 0; j--)
+                    {
+                        m_CurBlockTeam.MoveRight();
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    public void OnTimer()
+    {
+        if (m_CurBlockTeam == null)
+        {
+            if(!Dispel())
+                NewBlockTeam();
+        }
+        else
+            OnDown();
+    }
+
     void Merge(BlockTeam bt)
     {
         Vector2Int vPos = bt.GetPos();
@@ -168,5 +213,42 @@ public class BlockWall {
                 }
             }
         }
+    }
+
+    bool Dispel()
+    {
+        bool bDispel = false;
+        int iIndex = GetWidth() - 1;
+        while (iIndex >= 0)
+        {
+            int iSum = 0;
+            for (int j = 0;j<GetHeight();j++)
+            {
+                int iValue;
+                if (GetValue(iIndex, j, out iValue))
+                {
+                    iSum += iValue;
+                }
+            }
+            if (iSum == GetWidth())
+            {
+                for (int i = iIndex;i>=0;i--)
+                {
+                    for (int j = 0; j < GetHeight(); j++)
+                    {
+                        if (i - 1 >= 0)
+                            m_WallData[i, j] = m_WallData[i - 1, j];
+                        else
+                            m_WallData[i, j] = 0;
+                    }
+                }
+                bDispel = true;
+            }
+            else
+            {
+                iIndex--;
+            }
+        }
+        return bDispel;
     }
 }
