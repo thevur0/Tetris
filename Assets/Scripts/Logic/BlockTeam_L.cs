@@ -12,7 +12,7 @@ public class BlockTeam_L: BlockTeam
                 {0,1,1,0},
                 {0,0,0,0}};
 
-        ms_RotPos.Add(vPos);
+        ms_RotPosData.Add(vPos);
 
         vPos = new int[4, 4]{
                 {0,0,1,0},
@@ -20,7 +20,7 @@ public class BlockTeam_L: BlockTeam
                 {0,0,0,0},
                 {0,0,0,0}};
 
-        ms_RotPos.Add(vPos);
+        ms_RotPosData.Add(vPos);
 
         vPos = new int[4, 4]{
                 {0,1,1,0},
@@ -28,7 +28,7 @@ public class BlockTeam_L: BlockTeam
                 {0,1,0,0},
                 {0,0,0,0}};
 
-        ms_RotPos.Add(vPos);
+        ms_RotPosData.Add(vPos);
 
         vPos = new int[4, 4]{
                 {1,0,0,0},
@@ -36,6 +36,6 @@ public class BlockTeam_L: BlockTeam
                 {0,0,0,0},
                 {0,0,0,0}};
 
-        ms_RotPos.Add(vPos);
+        ms_RotPosData.Add(vPos);
     }
 }

@@ -12,6 +12,6 @@ public class BlockTeam_O : BlockTeam
                 {0,1,1,0},
                 {0,0,0,0}};
 
-        ms_RotPos.Add(vPos);
+        ms_RotPosData.Add(vPos);
     }
 }
