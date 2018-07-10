@@ -4,6 +4,15 @@ using UnityEngine;
 using System;
 public class BlockWall {
 
+	public enum BlockColor
+	{
+		None = 0,
+        Gray,
+        Red,
+        Yellow,
+        Green,
+        Blue,
+	}
 
     static List<Type> m_BlockTeamType = new List<Type>();
     static BlockWall()
@@ -17,7 +26,7 @@ public class BlockWall {
         m_BlockTeamType.Add(typeof(BlockTeam_T));
     }
 
-    int[,] m_WallData = new int[10, 20];
+    int[,] m_WallData = new int[10, 18];
 
     public void Reset()
     {
@@ -43,6 +52,8 @@ public class BlockWall {
 
     bool IsCollide(BlockTeam bt, BT_Move_Type eBTMove = BT_Move_Type.BTM_None)
     {
+		if (bt == null)
+			return true;
         Vector2Int vPos = bt.GetPos();
         switch (eBTMove)
         {
@@ -95,12 +106,12 @@ public class BlockWall {
         bt.SetPos(iX, iY);
     }
 
-    int GetWidth()
+    public int GetWidth()
     {
         return m_WallData.GetLength(0);
     }
 
-    int GetHeight()
+    public int GetHeight()
     {
         return m_WallData.GetLength(1);
     }
@@ -108,12 +119,37 @@ public class BlockWall {
     bool GetValue(int iX, int iY, out int iValue)
     {
         iValue = 0;
-        if (iX >= GetWidth() || iY >= GetHeight())
+		if (iX >= GetWidth() || iY >= GetHeight() || iX<0 || iY<0)
             return false;
 
         iValue = m_WallData[iX, iY];
         return true;
     }
+
+	public bool GetBlockColor(int iX,int iY,out BlockColor blockColor)
+	{
+		blockColor = BlockColor.None;
+		int iValue = 0;
+		if(GetValue(iX,iY,out iValue))
+		{
+			if (iValue != 0)
+				blockColor = BlockColor.Gray;
+			else if(m_CurBlockTeam!=null)
+			{
+				iX = iX - m_CurBlockTeam.GetPos().x;
+				iY = iY - m_CurBlockTeam.GetPos().y;
+				if(m_CurBlockTeam.GetValue(iX,iY,out iValue))
+				{
+					if (iValue != 0)
+						blockColor = BlockColor.Red;
+				}
+			}
+				
+			return true;
+		}
+		else
+			return false;
+	}
 
     bool SetValue(int iX, int iY, int iValue)
     {
@@ -150,9 +186,15 @@ public class BlockWall {
             m_CurBlockTeam = null;
         }
     }
+	public void OnDrop()
+	{
+		
+	}
 
     public void OnRot()
     {
+		if (m_CurBlockTeam == null)
+			return;
         BlockTeam bt = m_CurBlockTeam.Clone();
         bt.Rot();
         if (!IsCollide(bt, BT_Move_Type.BTM_None))
@@ -194,8 +236,8 @@ public class BlockWall {
             if(!Dispel())
                 NewBlockTeam();
         }
-        else
-            OnDown();
+        //else
+            //OnDown();
     }
 
     void Merge(BlockTeam bt)
@@ -221,33 +263,42 @@ public class BlockWall {
         int iIndex = GetWidth() - 1;
         while (iIndex >= 0)
         {
-            int iSum = 0;
+			bool bContuine = false;
             for (int j = 0;j<GetHeight();j++)
             {
                 int iValue;
                 if (GetValue(iIndex, j, out iValue))
                 {
-                    iSum += iValue;
+					if(iValue == 0)
+					{
+						bContuine = true;
+						break;
+					}
                 }
+				else
+				{
+					bContuine = true;
+					break;
+				}
             }
-            if (iSum == GetWidth())
+			if (bContuine)
+			{
+				iIndex--;
+				continue;
+			}
+			
+            for (int i = iIndex;i>=0;i--)
             {
-                for (int i = iIndex;i>=0;i--)
+                for (int j = 0; j < GetHeight(); j++)
                 {
-                    for (int j = 0; j < GetHeight(); j++)
-                    {
-                        if (i - 1 >= 0)
-                            m_WallData[i, j] = m_WallData[i - 1, j];
-                        else
-                            m_WallData[i, j] = 0;
-                    }
+                    if (i - 1 >= 0)
+                        m_WallData[i, j] = m_WallData[i - 1, j];
+                    else
+                        m_WallData[i, j] = 0;
                 }
-                bDispel = true;
             }
-            else
-            {
-                iIndex--;
-            }
+            bDispel = true;
+
         }
         return bDispel;
     }

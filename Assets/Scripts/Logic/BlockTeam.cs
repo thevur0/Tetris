@@ -13,7 +13,7 @@ public abstract class BlockTeam {
         BI_Count
     }
     protected List<BaseBlock> m_BlockList = new List<BaseBlock>((int)BlockIndex.BI_Count);
-    static protected List<int[,]> ms_RotPosData = new List<int[,]>();
+    //static protected List<int[,]> ms_RotPosData = new List<int[,]>();
     //protected List<int[,]>.Enumerator m_PosEnumer;
     int m_iIndexPos = 0;
     protected Vector2Int m_Pos = Vector2Int.zero;
@@ -25,13 +25,13 @@ public abstract class BlockTeam {
     public void Rot()
     {
         m_iIndexPos++;
-        if (m_iIndexPos >= ms_RotPosData.Count)
+		if (m_iIndexPos >= GetRotData().Count)
             m_iIndexPos = 0;
     }
 
     int[,] CurrentPos()
     {
-        return ms_RotPosData[m_iIndexPos];
+		return GetRotData()[m_iIndexPos];
     }
 
     public void SetPos(int iX,int iY)
@@ -164,10 +164,16 @@ public abstract class BlockTeam {
     public bool GetValue(int iX, int iY,out int iValue)
     {
         iValue = 0;
-        if (iX >= GetWidth() || iY >= GetHeight())
+		if (iX >= GetWidth() || iY >= GetHeight() || iX < 0 || iY<0)
             return false;
-
-        iValue = CurrentPos()[iX, iY];
+		try
+		{
+			iValue = CurrentPos()[iX, iY];
+		}
+		catch(System.Exception ex)
+		{
+			Debug.LogException(ex);
+		}
         return true;
     }
 
@@ -191,4 +197,7 @@ public abstract class BlockTeam {
         BlockTeam bt = Activator.CreateInstance(this.GetType()) as BlockTeam;
         return bt;
     }
+
+	protected abstract List<int[,]> GetRotData();
+
 }

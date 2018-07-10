@@ -22,4 +22,6 @@ public class BlockTeam_Q: BlockTeam
 
         ms_RotPosData.Add(vPos);
     }
+	static protected List<int[,]> ms_RotPosData = new List<int[,]>();
+    protected override List<int[,]> GetRotData() { return ms_RotPosData; }
 }
