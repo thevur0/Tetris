@@ -13,8 +13,7 @@ public abstract class BlockTeam {
         BI_Count
     }
     protected List<BaseBlock> m_BlockList = new List<BaseBlock>((int)BlockIndex.BI_Count);
-    //static protected List<int[,]> ms_RotPosData = new List<int[,]>();
-    //protected List<int[,]>.Enumerator m_PosEnumer;
+    
     int m_iIndexPos = 0;
     protected Vector2Int m_Pos = Vector2Int.zero;
 
@@ -195,8 +194,15 @@ public abstract class BlockTeam {
     public virtual BlockTeam Clone()
     {
         BlockTeam bt = Activator.CreateInstance(this.GetType()) as BlockTeam;
+		bt.SetPos(this.GetPos().x, this.GetPos().y);
+		bt.SetRotIndex(m_iIndexPos);
+
         return bt;
     }
+	public void SetRotIndex(int iIndex)
+	{
+		m_iIndexPos = iIndex;
+	}
 
 	protected abstract List<int[,]> GetRotData();
 

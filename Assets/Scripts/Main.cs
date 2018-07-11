@@ -22,8 +22,8 @@ public class Main : MonoBehaviour {
 				m_Sprites[i,j] = go.GetComponent<SpriteRenderer>();
 				m_Sprites[i, j].enabled = false;
 				Vector3 pos = go.transform.position;
-				pos.x = pos.x + i * 0.45f;
-				pos.y = pos.y - j * 0.45f;
+				pos.x = pos.x + i * 0.40f;
+				pos.y = pos.y - j * 0.40f;
 				go.transform.position = pos;
 				go.SetActive(true);
 

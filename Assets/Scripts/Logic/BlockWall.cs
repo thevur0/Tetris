@@ -26,7 +26,7 @@ public class BlockWall {
         m_BlockTeamType.Add(typeof(BlockTeam_T));
     }
 
-    int[,] m_WallData = new int[10, 18];
+    int[,] m_WallData = new int[12, 20];
 
     public void Reset()
     {
@@ -74,11 +74,19 @@ public class BlockWall {
             for (int j = 0; j < bt.GetHeight(); j++)
             {
                 int iBTValue, iWallValue;
-                if (bt.GetValue(i, j, out iBTValue) && GetValue(i + vPos.x, j + vPos.y, out iWallValue))
+                if (bt.GetValue(i, j, out iBTValue))
                 {
-                    if (iBTValue + iWallValue > 1)
+					if(iBTValue != 0)
                     {
-                        return true;
+						if(GetValue(i + vPos.x, j + vPos.y, out iWallValue))
+						{
+							if (iWallValue != 0)
+                                return true;
+						}
+						else
+						{
+							return true;
+						}
                     }
                 }
                 else
@@ -236,8 +244,8 @@ public class BlockWall {
             if(!Dispel())
                 NewBlockTeam();
         }
-        //else
-            //OnDown();
+        else
+            OnDown();
     }
 
     void Merge(BlockTeam bt)
@@ -260,14 +268,14 @@ public class BlockWall {
     bool Dispel()
     {
         bool bDispel = false;
-        int iIndex = GetWidth() - 1;
+		int iIndex = GetHeight() - 1;
         while (iIndex >= 0)
         {
 			bool bContuine = false;
-            for (int j = 0;j<GetHeight();j++)
+			for (int i = 0;i<GetWidth();i++)
             {
                 int iValue;
-                if (GetValue(iIndex, j, out iValue))
+				if (GetValue(i, iIndex, out iValue))
                 {
 					if(iValue == 0)
 					{
@@ -287,12 +295,12 @@ public class BlockWall {
 				continue;
 			}
 			
-            for (int i = iIndex;i>=0;i--)
+            for (int j = iIndex;j>=0;j--)
             {
-                for (int j = 0; j < GetHeight(); j++)
+				for (int i = 0; i < GetWidth(); i++)
                 {
-                    if (i - 1 >= 0)
-                        m_WallData[i, j] = m_WallData[i - 1, j];
+                    if (j - 1 >= 0)
+                        m_WallData[i, j] = m_WallData[i, j-1];
                     else
                         m_WallData[i, j] = 0;
                 }
