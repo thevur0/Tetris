@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+
+
 public class BlockWall {
 
 	public enum BlockColor
@@ -28,7 +30,11 @@ public class BlockWall {
 
     int[,] m_WallData = new int[12, 20];
 
-    public void Reset()
+    BlockTeam m_CurBlockTeam = null;
+    BlockTeam m_DropDownBT = null;
+    Queue<BlockTeam> m_BlockTeamQueue = new Queue<BlockTeam>();
+
+    void Reset()
     {
         for (int i = 0; i < m_WallData.GetLength(0); i++)
         {
@@ -38,9 +44,17 @@ public class BlockWall {
             }
         }
         m_CurBlockTeam = null;
+        m_DropDownBT = null;
+        m_BlockTeamQueue.Clear();
     }
 
-    System.Random rand = new System.Random();
+    public void Start()
+    {
+        Reset();
+        EnqueueBlockTeam();
+        EnqueueBlockTeam();
+    }
+    System.Random m_Rand = new System.Random();
 
     enum BT_Move_Type
     {
@@ -98,13 +112,32 @@ public class BlockWall {
         return false;
     }
 
-    void NewBlockTeam()
+    void EnqueueBlockTeam()
     {
-        int iIndex = rand.Next(0, m_BlockTeamType.Count);
+        int iIndex = m_Rand.Next(0, m_BlockTeamType.Count);
         Type type = m_BlockTeamType[iIndex];
         BlockTeam bt = Activator.CreateInstance(type) as BlockTeam;
+        m_BlockTeamQueue.Enqueue(bt);
+    }
+    void NewBlockTeam()
+    {
+        EnqueueBlockTeam();
+        BlockTeam bt = m_BlockTeamQueue.Dequeue();
         InitBlockTeamPos(bt);
         m_CurBlockTeam = bt;
+        m_DropDownBT = m_CurBlockTeam.Clone();
+        m_CurBlockTeam.OnBlockMove += OnCurBlockTeamUpdate;
+        m_CurBlockTeam.OnBlockRot += OnCurBlockTeamUpdate;
+        OnCurBlockTeamUpdate();
+    }
+
+    void OnCurBlockTeamUpdate()
+    {
+        m_CurBlockTeam.CopyTo(m_DropDownBT);
+        while (!IsCollide(m_DropDownBT, BT_Move_Type.BTM_Down))
+        {
+            m_DropDownBT.MoveDown();
+        }
     }
 
     void InitBlockTeamPos(BlockTeam bt)
@@ -140,18 +173,32 @@ public class BlockWall {
 		int iValue = 0;
 		if(GetValue(iX,iY,out iValue))
 		{
-			if (iValue != 0)
-				blockColor = BlockColor.Gray;
-			else if(m_CurBlockTeam!=null)
-			{
-				iX = iX - m_CurBlockTeam.GetPos().x;
-				iY = iY - m_CurBlockTeam.GetPos().y;
-				if(m_CurBlockTeam.GetValue(iX,iY,out iValue))
-				{
-					if (iValue != 0)
-						blockColor = BlockColor.Red;
-				}
-			}
+            if (iValue != 0)
+                blockColor = BlockColor.Gray;
+            else
+            {
+                if (m_CurBlockTeam != null)
+                {
+                    iX = iX - m_CurBlockTeam.GetPos().x;
+                    iY = iY - m_CurBlockTeam.GetPos().y;
+                    if (m_CurBlockTeam.GetValue(iX, iY, out iValue))
+                    {
+                        if (iValue != 0)
+                            blockColor = BlockColor.Red;
+                    }
+                }
+
+                if (m_DropDownBT != null)
+                {
+                    iX = iX - m_DropDownBT.GetPos().x;
+                    iY = iY - m_DropDownBT.GetPos().y;
+                    if (m_DropDownBT.GetValue(iX, iY, out iValue))
+                    {
+                        if (iValue != 0)
+                            blockColor = BlockColor.Yellow;
+                    }
+                }
+            }
 				
 			return true;
 		}
@@ -168,7 +215,8 @@ public class BlockWall {
         return true;
     }
 
-    BlockTeam m_CurBlockTeam = null;
+    
+
     public void OnLeft()
     {
         BlockTeam bt = m_CurBlockTeam;
@@ -192,11 +240,14 @@ public class BlockWall {
         {
             Merge(bt);
             m_CurBlockTeam = null;
+            m_DropDownBT = null;
         }
     }
 	public void OnDrop()
 	{
-		
+        if (m_DropDownBT == null || m_CurBlockTeam == null)
+            return;
+        m_DropDownBT.CopyTo(m_CurBlockTeam);
 	}
 
     public void OnRot()

@@ -51,7 +51,7 @@ public class Main : MonoBehaviour {
     BlockWall m_BlockWall = new BlockWall();
     public void OnGameStart()
     {
-        m_BlockWall.Reset();
+        m_BlockWall.Start();
         StartTimer();
     }
     public void OnPauseGame()

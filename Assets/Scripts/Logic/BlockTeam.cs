@@ -4,6 +4,12 @@ using UnityEngine;
 using System;
 public abstract class BlockTeam {
 
+    public delegate void ActionBTMove();
+    public delegate void ActionBTRot();
+
+    public event ActionBTMove OnBlockMove;
+    public event ActionBTRot OnBlockRot;
+
     enum BlockIndex
     {
         BI_First = 0,
@@ -26,6 +32,8 @@ public abstract class BlockTeam {
         m_iIndexPos++;
 		if (m_iIndexPos >= GetRotData().Count)
             m_iIndexPos = 0;
+        if (OnBlockRot != null)
+            OnBlockRot.Invoke();
     }
 
     int[,] CurrentPos()
@@ -89,6 +97,11 @@ public abstract class BlockTeam {
             }
         }
         return iIndex;
+    }
+    public void CopyTo(BlockTeam bt)
+    {
+        bt.SetPos(GetPos().x, GetPos().y);
+        bt.SetRotIndex(m_iIndexPos);
     }
 
     //public int GetBottomOffset()
@@ -179,11 +192,15 @@ public abstract class BlockTeam {
     public void MoveLeft()
     {
         m_Pos.x -= 1;
+        if(OnBlockMove!=null)
+            OnBlockMove.Invoke();
     }
 
     public void MoveRight()
     {
         m_Pos.x += 1;
+        if (OnBlockMove != null)
+            OnBlockMove.Invoke();
     }
 
     public void MoveDown()
@@ -202,7 +219,10 @@ public abstract class BlockTeam {
 	public void SetRotIndex(int iIndex)
 	{
 		m_iIndexPos = iIndex;
-	}
+        if (OnBlockRot != null)
+            OnBlockRot.Invoke();
+
+    }
 
 	protected abstract List<int[,]> GetRotData();
 
