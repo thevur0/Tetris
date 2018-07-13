@@ -38,7 +38,7 @@ public class Main : MonoBehaviour {
     }
 	// Update is called once per frame
 	bool bOnTimer = false;
-    void Update () {
+    void FixedUpdate () {
         CheckMouse();
 		if (bOnTimer)
 		{
@@ -115,13 +115,15 @@ public class Main : MonoBehaviour {
     }
     bool m_bGetBeginPos = false;
     Vector3 m_BeginPosition = Vector3.zero;
-    float m_fCheckTime = 0.5f;
+    const float m_fCheckTime = 0.0f;
     float m_fSaveTime = 0.0f;
-    float m_fMoveDis = 10.0f;
+    const float m_fMoveDis = 40.0f;
+	bool m_bMove = false;
     void CheckMouse()
     {
         if (Input.GetMouseButtonDown(0))
         {
+			m_bMove = false;
             m_fSaveTime = 0;
             if (m_bGetBeginPos)
             {
@@ -129,35 +131,34 @@ public class Main : MonoBehaviour {
                 m_bGetBeginPos = false;
             }
         }
-        bool bMove = false;
         if (Input.GetMouseButton(0))
         {
             m_fSaveTime += Time.deltaTime;
             if (m_fSaveTime > m_fCheckTime)
             {
                 Vector3 vDis = Input.mousePosition - m_BeginPosition;
-                if (Mathf.Abs(vDis.x) > m_fMoveDis)
+				if (Mathf.Abs(vDis.x) > m_fMoveDis && Mathf.Abs(vDis.y) < Mathf.Abs(vDis.x))
                 {
                     if (vDis.x < 0)
                         OnLeftMove();
                     else
                         OnRightMove();
                     m_BeginPosition = Input.mousePosition;
-                    bMove = true;
+                    m_bMove = true;
                 }
             }
         }
         if (Input.GetMouseButtonUp(0))
         {
             m_bGetBeginPos = true;
-            if (!bMove)
+			if (!m_bMove)
             {
                 Vector3 vDis = Input.mousePosition - m_BeginPosition;
                 if (Mathf.Abs(vDis.y) > Mathf.Abs(vDis.x) * 3.0f / 2.0f)
                 {
                     OnDropDown();
                 }
-                else if (m_fSaveTime < m_fCheckTime) 
+                else //if (m_fSaveTime < m_fCheckTime) 
                 {
                     OnClick();
                 }

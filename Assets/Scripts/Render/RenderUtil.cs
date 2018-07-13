@@ -7,6 +7,7 @@ public class RenderUtil
     static Dictionary<BlockWall.BlockColor, Color> m_dicColor = new Dictionary<BlockWall.BlockColor, Color>();
     static RenderUtil()
     {
+		m_dicColor.Add(BlockWall.BlockColor.Gray, Color.gray);
         m_dicColor.Add(BlockWall.BlockColor.Red,Color.red);
         m_dicColor.Add(BlockWall.BlockColor.Yellow, Color.yellow);
     }

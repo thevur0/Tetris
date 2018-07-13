@@ -177,27 +177,27 @@ public class BlockWall {
                 blockColor = BlockColor.Gray;
             else
             {
-                if (m_CurBlockTeam != null)
+				if (m_DropDownBT != null)
                 {
-                    iX = iX - m_CurBlockTeam.GetPos().x;
-                    iY = iY - m_CurBlockTeam.GetPos().y;
-                    if (m_CurBlockTeam.GetValue(iX, iY, out iValue))
-                    {
-                        if (iValue != 0)
-                            blockColor = BlockColor.Red;
-                    }
-                }
-
-                if (m_DropDownBT != null)
-                {
-                    iX = iX - m_DropDownBT.GetPos().x;
-                    iY = iY - m_DropDownBT.GetPos().y;
-                    if (m_DropDownBT.GetValue(iX, iY, out iValue))
+                    int iBTX = iX - m_DropDownBT.GetPos().x;
+                    int iBTY = iY - m_DropDownBT.GetPos().y;
+                    if (m_DropDownBT.GetValue(iBTX, iBTY, out iValue))
                     {
                         if (iValue != 0)
                             blockColor = BlockColor.Yellow;
                     }
                 }
+
+                if (m_CurBlockTeam != null)
+                {
+                    int iBTX = iX - m_CurBlockTeam.GetPos().x;
+                    int iBTY = iY - m_CurBlockTeam.GetPos().y;
+					if (m_CurBlockTeam.GetValue(iBTX, iBTY, out iValue))
+                    {
+                        if (iValue != 0)
+                            blockColor = BlockColor.Red;
+                    }
+                } 
             }
 				
 			return true;
