@@ -69,16 +69,18 @@ public class BlockWall {
 		if (bt == null)
 			return true;
         Vector2Int vPos = bt.GetPos();
+		int iX = vPos.x;
+		int iY = vPos.y;
         switch (eBTMove)
         {
             case BT_Move_Type.BTM_Left:
-                vPos.x -= 1;
+				iX = vPos.x - 1;
                 break;
             case BT_Move_Type.BTM_Right:
-                vPos.x += 1;
+				iX = vPos.x + 1;
                 break;
             case BT_Move_Type.BTM_Down:
-                vPos.y += 1;
+				iY = vPos.y + 1;
                 break;
             default:
                 break;
@@ -92,7 +94,7 @@ public class BlockWall {
                 {
 					if(iBTValue != 0)
                     {
-						if(GetValue(i + vPos.x, j + vPos.y, out iWallValue))
+						if(GetValue(i + iX, j + iY, out iWallValue))
 						{
 							if (iWallValue != 0)
                                 return true;
